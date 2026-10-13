@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  html{color-scheme:light}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>Управленческий учёт Фаэтон</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: шапка, три входа в систему, под ними схема движения данных и порядок закрытия месяца */
+:root{
+  --bg:#f3f6f4; --surface:#ffffff; --ink:#0d1b16; --muted:#5a6d64;
+  --line:#d6dfd9; --deep:#1f4b3f; --accent:#c4751b; --accent-soft:#f7ecdd;
+  --good:#1a7a4c;
+  --display:'Oswald','Arial Narrow',Arial,sans-serif;
+  --body:'Golos Text','Segoe UI',Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1411; --surface:#15201b; --ink:#e7eee9; --muted:#95a99e;
+    --line:#27362f; --deep:#79c9a3; --accent:#e5a04c; --accent-soft:#2a2117;
+    --good:#4fc58a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1411; --surface:#15201b; --ink:#e7eee9; --muted:#95a99e;
+  --line:#27362f; --deep:#79c9a3; --accent:#e5a04c; --accent-soft:#2a2117;
+  --good:#4fc58a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;
+     -webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding-inline:20px;padding-block:44px 64px}
+
+.eyebrow{font-family:var(--display);font-weight:500;font-size:13px;letter-spacing:.18em;
+         text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(38px,9vw,68px);line-height:.95;
+   letter-spacing:.01em;margin:.12em 0 0;text-wrap:balance}
+h1 .mark{color:var(--accent)}
+.lede{margin:14px 0 0;max-width:62ch;color:var(--muted);font-size:15px}
+.rule{height:3px;background:var(--deep);width:72px;margin:26px 0 0;border-radius:2px}
+
+h2{font-family:var(--display);font-weight:500;font-size:15px;letter-spacing:.14em;
+   text-transform:uppercase;color:var(--muted);margin:48px 0 16px}
+
+.cards{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:720px){.cards{grid-template-columns:repeat(3,1fr)}}
+.card{display:flex;flex-direction:column;min-width:0;background:var(--surface);
+      border:1px solid var(--line);border-radius:10px;padding:20px;text-decoration:none;color:inherit;
+      transition:border-color .15s ease, transform .15s ease}
+a.card:hover{border-color:var(--deep);transform:translateY(-2px)}
+a.card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.role{font-family:var(--display);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--accent);margin:0 0 10px}
+.card h3{font-family:var(--display);font-weight:500;font-size:23px;line-height:1.15;margin:0;
+         letter-spacing:.01em}
+.card p{margin:8px 0 0;font-size:13.5px;color:var(--muted)}
+.sheets{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px}
+.sheets li{font-size:11.5px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;
+           color:var(--muted);background:var(--bg)}
+.open{margin-top:auto;padding-top:18px;font-family:var(--display);font-size:13px;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--deep);display:flex;align-items:center;gap:7px}
+.open span{transition:transform .15s ease}
+a.card:hover .open span{transform:translateX(4px)}
+.card.pending{border-style:dashed}
+.card.pending .role{color:var(--muted)}
+.card.pending .open{color:var(--muted)}
+
+.flow{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px 20px;
+      overflow-x:auto}
+.flow-grid{display:grid;gap:14px 20px;grid-template-columns:1fr;min-width:0}
+@media(min-width:720px){.flow-grid{grid-template-columns:1fr 1fr}}
+.stage{min-width:0}
+.stage h4{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.14em;
+          text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.chain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+.chain li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;min-width:0}
+.dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:var(--deep);margin-top:6px}
+.dot.alt{background:var(--accent)}
+.chain b{font-weight:600}
+.chain em{font-style:normal;color:var(--muted)}
+
+.steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:10px}
+.steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;background:var(--surface);
+          border:1px solid var(--line);border-left:3px solid var(--deep);border-radius:8px;
+          padding:13px 16px;font-size:14px;min-width:0}
+.steps li::before{content:counter(s);font-family:var(--display);font-size:15px;color:var(--accent);
+                  flex:0 0 auto;width:20px;font-variant-numeric:tabular-nums}
+.steps b{font-weight:600}
+.steps em{font-style:normal;color:var(--muted)}
+
+.foot{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;
+      gap:10px 28px;font-size:12.5px;color:var(--muted)}
+.foot b{color:var(--ink);font-weight:600}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Система управленческого учёта</p>
+  <h1>ФА<span class="mark">Э</span>ТОН</h1>
+  <p class="lede">Услуги спецтехники. Три файла держат весь учёт: механик считает часы, бухгалтер —
+     зарплату, учётная таблица собирает из этого прибыль, деньги и продажи.</p>
+  <div class="rule"></div>
+
+  <h2>Файлы системы</h2>
+  <div class="cards">
+    <a class="card" href="https://docs.google.com/spreadsheets/d/1x7JJOor4kaUpYhqQo-_WyP5Lh1uaVAT0O6eTLfiHnGM/edit" target="_blank" rel="noopener">
+      <p class="role">Отчёты</p>
+      <h3>Учёт спецтехники</h3>
+      <p>Главная таблица. Сюда загружается выписка банка, отсюда собираются все отчёты.</p>
+      <ul class="sheets">
+        <li>ОПиУ</li><li>ДДС</li><li>Продажи</li><li>Сверка</li>
+        <li>Банк</li><li>Журнал операций</li><li>Топливо</li><li>Справочник</li>
+      </ul>
+      <p class="open">Открыть таблицу <span>→</span></p>
+    </a>
+
+    <a class="card" href="https://docs.google.com/spreadsheets/d/1FQPuzw8vbzx9etHlrQcqhBUQAFtexoOMarHYU4RmgZs/edit" target="_blank" rel="noopener">
+      <p class="role">Начисление</p>
+      <h3>Расчёт зарплаты</h3>
+      <p>Табели по месяцам: часы по дням, ставка, премия. Итоги уходят в реестр, из реестра — в ОПиУ.</p>
+      <ul class="sheets">
+        <li>Сотрудники</li><li>Месяцы</li><li>Реестр ЗП</li><li>Свод</li>
+      </ul>
+      <p class="open">Открыть таблицу <span>→</span></p>
+    </a>
+
+    <a class="card" href="https://docs.google.com/spreadsheets/d/19IDWoGnwtNWuZK39l0dX1NipPWsPglu9Q_XbPsUXgAw/edit" target="_blank" rel="noopener">
+      <p class="role">Источник данных</p>
+      <h3>Таблица механика</h3>
+      <p>Учёт отработанного времени: смены по технике и заказчикам. Отсюда берётся вся выручка.</p>
+      <ul class="sheets">
+        <li>Журнал часов</li><li>Справочники</li><li>Свод</li>
+      </ul>
+      <p class="open">Открыть таблицу <span>→</span></p>
+    </a>
+  </div>
+
+  <h2>Откуда берётся каждая цифра</h2>
+  <div class="flow">
+    <div class="flow-grid">
+      <div class="stage">
+        <h4>Приходит в учётную таблицу</h4>
+        <ul class="chain">
+          <li><span class="dot"></span><span><b>Журнал часов</b> — выручка по актам и загрузка техники.
+            <em>Часы × ставка клиенту.</em></span></li>
+          <li><span class="dot"></span><span><b>Реестр ЗП</b> — начисленная зарплата последним числом месяца.
+            <em>Статьи: машинисты, механик и слесари.</em></span></li>
+          <li><span class="dot"></span><span><b>Топливо</b> — литры × цена, НДС к вычету только по технике ООО.</span></li>
+          <li><span class="dot alt"></span><span><b>Выписка ВТБ</b> — грузится через меню, раскладывается
+            по статьям правилами разноски.</span></li>
+        </ul>
+      </div>
+      <div class="stage">
+        <h4>Собирается на выходе</h4>
+        <ul class="chain">
+          <li><span class="dot"></span><span><b>ОПиУ</b> — по начислению или по оплате, с НДС или без.
+            <em>До чистой прибыли и рентабельности.</em></span></li>
+          <li><span class="dot"></span><span><b>ДДС</b> — только деньги, с остатком на начало и конец
+            и сверкой с банком.</span></li>
+          <li><span class="dot"></span><span><b>Продажи</b> — выручка, часы и загрузка по технике,
+            заказчикам и машинистам.</span></li>
+          <li><span class="dot alt"></span><span><b>Сверка</b> — начислено и оплачено рядом, и мост
+            от прибыли к денежному потоку.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>Закрытие месяца</h2>
+  <ol class="steps">
+    <li><span><b>Механик закрывает журнал часов</b> за месяц — смены, техника, заказчики.</span></li>
+    <li><span><b>Бухгалтер считает зарплату</b>: часы по дням, премия, реестр за месяц.</span></li>
+    <li><span><b>Загружается выписка банка</b> за месяц. <em>Отчёты → Загрузить выписку.</em></span></li>
+    <li><span><b>Вносится топливо и расходы по актам</b> в журнал операций — с датой начисления и датой оплаты.</span></li>
+    <li><span><b>Собираются отчёты</b> одной кнопкой и проверяется сверка: остаток должен сойтись с банком.</span></li>
+  </ol>
+
+  <div class="foot">
+    <span>ООО «Фаэтон» · услуги спецтехники</span>
+    <span>Расчётный счёт — <b>ВТБ</b></span>
+    <span>НДС <b>22%</b></span>
+    <span>Ставки техники и сотрудников — в справочниках</span>
+  </div>
+</div>
+</body>
+</html>
